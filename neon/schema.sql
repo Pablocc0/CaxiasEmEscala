@@ -1,0 +1,10 @@
+begin;
+create table if not exists public.app_members(user_id text primary key,role text not null default 'Funcionário' check(role in('Administrador','Gestor','Funcionário')));
+create table if not exists public.app_state(id integer primary key check(id=1),version bigint not null default 0,state jsonb not null default '{"departments":[],"employees":[],"shifts":[],"assignments":[],"settings":{"organization":"Prefeitura de Caxias - MA","systemName":"Caxias em Escala","weekStartsOn":1}}'::jsonb);
+create table if not exists public.audit_log(id bigint generated always as identity primary key,user_id text not null,user_name text not null default '',user_email text not null default '',user_role text not null,action text not null,entity text,entity_id text,details jsonb not null default '{}'::jsonb,ip_address text,created_at timestamptz not null default now());
+create index if not exists audit_log_created_idx on public.audit_log(created_at desc);create index if not exists audit_log_user_idx on public.audit_log(user_id,created_at desc);
+insert into public.app_state(id)values(1)on conflict do nothing;
+alter table public.app_members enable row level security;alter table public.app_state enable row level security;alter table public.audit_log enable row level security;
+revoke all on public.app_members,public.app_state,public.audit_log from public;
+do $$declare r text;begin for r in select rolname from pg_roles where rolname in('anonymous','anon','authenticated')loop execute format('revoke all on public.app_members,public.app_state,public.audit_log from %I',r);end loop;end$$;
+commit;
