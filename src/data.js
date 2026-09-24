@@ -7,5 +7,7 @@ export function mondayOf(value=new Date()){const d=typeof value==='string'?new D
 export function addDays(value,n){const d=new Date(`${value}T12:00:00`);d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
 export const weekDates=monday=>Array.from({length:7},(_,i)=>addDays(monday,i))
 export const initials=name=>String(name||'?').split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase()
+export const digits=value=>String(value||'').replace(/\D/g,'')
+export const phoneText=value=>digits(value).slice(0,11).replace(/^(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d{4})$/,'$1-$2')
 export const emptyState={departments:[],employees:[],shifts:[],assignments:[],settings:{organization:'Prefeitura de Caxias - MA',systemName:'Caxias em Escala',weekStartsOn:1}}
 export const assignmentStatus=a=>a.status||'Escalado'
